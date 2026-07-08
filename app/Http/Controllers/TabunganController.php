@@ -15,7 +15,7 @@ class TabunganController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'silahkan login dulu'
-            ], 403);
+            ], 401);
         }
 
         $tabugans = Tabungan::where('user_id', $user_id)->get();
@@ -56,7 +56,7 @@ class TabunganController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'silahkan login dulu'
-            ], 403);
+            ], 401);
         }
 
         $request->validate([
@@ -89,12 +89,14 @@ class TabunganController extends Controller
 
     // TRANSAKSI
     public function transaksi(Request $request, $id) {
-        $user_id = $request->user()->id;
+        $user = $request->user();
+        $user_id = $user->id;
+
         if(!$user_id) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'silahkan login dulu'
-            ], 403);
+            ], 401);
         }
         
         $request->validate([
@@ -102,7 +104,6 @@ class TabunganController extends Controller
             'type' => 'required|in:nabung,ambil'
         ]);
 
-        $user_id = $request->user()->id;
         $tabungan = Tabungan::where('id', $id)->where('user_id', $user_id)->first();
 
         if(!$tabungan) {
@@ -112,11 +113,27 @@ class TabunganController extends Controller
             ], 404);
         }
 
-        if($request->type == 'nabung') {
-            $tabungan->increment('terkumpul', $request->nominal);
+        if($request->type == 'ambil') {
+            if($request->nominal > $tabungan->terkumpul) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'uang terkumpul kurang'
+                ], 422);
+            }
+            else{
+                $tabungan->decrement('terkumpul', $request->nominal);
+                $user->decrement('jumlah_terkumpul', $request->nominal);
+            }
         }
         else {
-            $tabungan->decrement('terkumpul', $request->nominal);
+            if($tabungan->terkumpul >= $tabungan->target) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'tabungan telah mencapai target'
+                ], 422);
+            }
+            $tabungan->increment('terkumpul', $request->nominal);
+            $user->increment('jumlah_terkumpul', $request->nominal);
         }
 
         Histori::create([
@@ -133,12 +150,14 @@ class TabunganController extends Controller
 
     // DESTROY
     public function destroy(Request $request, $id) {
-        $user_id = $request->user()->id;
+        $user = $request->user();
+        $user_id = $user->id;
+
         if(!$user_id) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'silahkan login dulu'
-            ], 403);
+            ], 401);
         }
         
         $tabungan = Tabungan::where('id', $id)->where('user_id', $user_id)->first();
@@ -149,6 +168,8 @@ class TabunganController extends Controller
                 'message' => 'Tabungan tidak ditemukan'
             ], 404);
         }
+        
+        $user->decrement('jumlah_terkumpul', $tabungan->terkumpul);
 
         $tabungan->delete();
 

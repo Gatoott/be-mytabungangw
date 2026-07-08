@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('username')->unique();
             $table->string('password');
-            $table->bigInteger('jumlah_terkumpul');
+            $table->bigInteger('jumlah_terkumpul')->default(0);
             $table->timestamps();
         });
 

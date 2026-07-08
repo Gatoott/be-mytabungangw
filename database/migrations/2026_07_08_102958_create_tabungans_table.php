@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users', 'id')->cascadeOnDelete();
             $table->string('nama_tabungan');
             $table->bigInteger('target');
-            $table->bigInteger('target_perhari');
+            $table->bigInteger('perhari');
             $table->bigInteger('terkumpul')->default(0);
             $table->timestamps();
         });
