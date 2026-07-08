@@ -30,4 +30,12 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function tabungans() {
+        return $this->hasMany(Tabungan::class);
+    }
+
+    public function historis() {
+        return $this->hasMany(Histori::class);
+    }
 }
