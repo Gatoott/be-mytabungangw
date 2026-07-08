@@ -16,6 +16,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/histori', [HistoriController::class, 'index']);
 
     Route::get('/me', [UserController::class, 'me']);
+    Route::post('/logout', [UserController::class, 'logout']);
 });
 
 Route::post('/login', [UserController::class, 'login']);
