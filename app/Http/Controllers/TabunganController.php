@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 
 class TabunganController extends Controller
 {
+    // INDEX
     public function index(Request $request) {
         $user_id = $request->user()->id;
         if(!$user_id) {
@@ -25,6 +26,7 @@ class TabunganController extends Controller
         ], 200);
     }
 
+    // STORE
     public function store(Request $request) {
         $request->validate([
             'nama_tabungan' => 'required',
@@ -47,7 +49,16 @@ class TabunganController extends Controller
         ], 201);
     }
 
+    // UPDATE
     public function update(Request $request, $id) {
+        $user_id = $request->user()->id;
+        if(!$user_id) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'silahkan login dulu'
+            ], 403);
+        }
+
         $request->validate([
             'nama_tabungan' => 'required',
             'target' => 'required',
@@ -76,7 +87,16 @@ class TabunganController extends Controller
         ], 200);
     }
 
+    // TRANSAKSI
     public function transaksi(Request $request, $id) {
+        $user_id = $request->user()->id;
+        if(!$user_id) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'silahkan login dulu'
+            ], 403);
+        }
+        
         $request->validate([
             'nominal' => 'required|numeric',
             'type' => 'required|in:nabung,ambil'
@@ -108,6 +128,33 @@ class TabunganController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'transaksi berhasil'
+        ]);
+    }
+
+    // DESTROY
+    public function destroy(Request $request, $id) {
+        $user_id = $request->user()->id;
+        if(!$user_id) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'silahkan login dulu'
+            ], 403);
+        }
+        
+        $tabungan = Tabungan::where('id', $id)->where('user_id', $user_id)->first();
+
+        if(!$tabungan) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Tabungan tidak ditemukan'
+            ], 404);
+        }
+
+        $tabungan->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'berhasil menghapus tabungan'
         ]);
     }
 }

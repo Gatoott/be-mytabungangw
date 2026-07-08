@@ -11,6 +11,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/tabungan', [TabunganController::class, 'store']);
     Route::put('/tabungan/update/{id}', [TabunganController::class, 'update']);
     Route::put('/tabungan/transaksi/{id}', [TabunganController::class, 'transaksi']);
+    Route::delete('/tabungan/destroy/{id}', [TabunganController::class, 'destroy']);
 
     Route::get('/histori', [HistoriController::class, 'index']);
 });
