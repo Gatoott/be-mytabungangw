@@ -8,6 +8,21 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
+    public function me(Request $request) {
+        $user = $request->user();
+        if(!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'silahkan login dulu'
+            ], 401);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $user
+        ]);
+    }
+
     public function regis(Request $request) {
         $request->validate([
             'username' => 'required|unique:users,username',

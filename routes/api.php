@@ -14,6 +14,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/tabungan/destroy/{id}', [TabunganController::class, 'destroy']);
 
     Route::get('/histori', [HistoriController::class, 'index']);
+
+    Route::get('/me', [UserController::class, 'me']);
 });
 
 Route::post('/login', [UserController::class, 'login']);
